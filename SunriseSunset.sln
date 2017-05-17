@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SunriseSunset.ConsoleDemo",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SunriseSunset.WebDemo", "SunriseSunset.WebDemo\SunriseSunset.WebDemo.csproj", "{F86924DD-896A-4CE7-A039-D2873F14CD91}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SunriseSunset.Test", "SunriseSunset.Test\SunriseSunset.Test.csproj", "{D128A361-EDBD-476B-8321-B1E4DA40AEAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{F86924DD-896A-4CE7-A039-D2873F14CD91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F86924DD-896A-4CE7-A039-D2873F14CD91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F86924DD-896A-4CE7-A039-D2873F14CD91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D128A361-EDBD-476B-8321-B1E4DA40AEAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D128A361-EDBD-476B-8321-B1E4DA40AEAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D128A361-EDBD-476B-8321-B1E4DA40AEAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D128A361-EDBD-476B-8321-B1E4DA40AEAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
