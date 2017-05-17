@@ -14,6 +14,10 @@ namespace SunriseSunset.Test
         public void Setup()
         {
             address = "3817 McCoy Dr. Suite 105 Aurora, IL 60504";
+
+            // TODO: set up new USNavyData object with defined values and use for tests
+
+
         }
         
 
