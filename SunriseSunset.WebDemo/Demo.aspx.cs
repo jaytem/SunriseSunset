@@ -32,11 +32,11 @@ namespace SunriseSunset.WebDemo
             DateTime startTime = DateTime.Now;
 
             StringBuilder output = new StringBuilder();
-
+            
             foreach(var addr in addressList)
             {
                 var data = _SunriseSunsetService.Service.Get(addr);
-
+                
                 output.Append(string.Format("Address: {0}<br />TimeZone: {1}<br />Sunrise: {2}<br />Sunset: {3}<br />Current local time: {5}<br />Test local time: {6}<br />IsDay: {4}<br /><br />",
                     data.Address,
                     data.TimeZoneName, 
@@ -51,7 +51,7 @@ namespace SunriseSunset.WebDemo
             DateTime endTime = DateTime.Now;
             TimeSpan processTime = endTime - startTime;
 
-            litoutput.Text += string.Format("<br />Run Time: {0} milliseconds<br /><br />{1}<br /><hr />", processTime.Milliseconds, output.ToString());
+            litoutput.Text += string.Format("<br />Total Run Time: {0} milliseconds<br /><br />{1}<br /><hr />", processTime.Milliseconds, output.ToString());
         }
 
         protected void btnClear_Click(object sender, EventArgs e)
