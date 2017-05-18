@@ -11,8 +11,9 @@
         <div>
 
             <div style="margin-bottom: 10px;">
-                Add
-                <asp:TextBox ID="txtPlusHours" runat="server" Text="0" Style="width: 20px" />
+                Add 
+                <asp:TextBox ID="txtPlusHours" runat="server" Text="0" Style="width: 20px" /> 
+                hours to current time
             </div>
             <div style="margin-bottom: 10px">
                 <asp:Button ID="btnGetnSunriseSunsetData" runat="server" Text="Get Sunrise/Sunset data" OnClick="btnGetnSunriseSunsetData_Click" />

@@ -8,6 +8,8 @@ namespace SunriseSunset.Abstractions
 
         string TimeZoneName { get; set; }
 
+        DateTime? CurrentTime { get; set; }
+
         DateTime? Sunrise { get; set; }
 
         DateTime? Sunset { get; set; }

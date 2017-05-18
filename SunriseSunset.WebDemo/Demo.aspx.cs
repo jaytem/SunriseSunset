@@ -37,12 +37,14 @@ namespace SunriseSunset.WebDemo
             {
                 var data = _SunriseSunsetService.Service.Get(addr);
 
-                output.Append(string.Format("Address: {0}<br />TimeZone: {1}<br />Sunrise: {2}<br />Sunset: {3}<br />IsDay: {4}<br /><br />",
+                output.Append(string.Format("Address: {0}<br />TimeZone: {1}<br />Sunrise: {2}<br />Sunset: {3}<br />Current local time: {5}<br />Test local time: {6}<br />IsDay: {4}<br /><br />",
                     data.Address,
                     data.TimeZoneName, 
                     data.Sunrise,
                     data.Sunset,
-                    data.IsDaylight(plusHours)));
+                    data.IsDaylight(plusHours),
+                    data.CurrentTime,
+                    data.CurrentTime.Value.AddHours(plusHours)));
             }
 
             // End time for lookup run time

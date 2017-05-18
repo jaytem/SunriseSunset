@@ -25,13 +25,15 @@ namespace SunriseSunset.ConsoleDemo
             {
                 var data = service.Get(addr);
 
-                Console.WriteLine(string.Format("Address: {0}{1}TimeZone: {5}{1}Sunrise: {2}{1}Sunset: {3}{1}IsDay: {4}{1}{1}",
+                Console.WriteLine(string.Format("Address: {0}{1}TimeZone: {5}{1}Sunrise: {2}{1}Sunset: {3}{1}Current local time: {6}{1}IsDay: {4}{1}{1}",
                     data.Address,
                     Environment.NewLine,
                     data.Sunrise,
                     data.Sunset,
                     data.IsDaylight(0).ToString(),
-                    data.TimeZoneName));
+                    data.TimeZoneName, 
+                    data.CurrentTime));
+                
             }
             
             Console.ReadLine();
