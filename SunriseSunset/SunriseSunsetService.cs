@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net;
 using System.Web;
 
 namespace SunriseSunset
@@ -20,11 +21,32 @@ namespace SunriseSunset
 
         public ISunriseSunsetData Get(string Address)
         {
-            var data = new SunriseSunsetData(Address);
+            IPAddress ipAddress;
+            if (IPAddress.TryParse(Address, out ipAddress))
+                return GetByIP(Address);
+                
+
+            return GetByStreetAddress(Address);
+        }
+
+        private ISunriseSunsetData GetByStreetAddress(string Address)
+        {
+            var data = new SunriseSunsetData();
+            data.Address = Address;
             data.CurrentTime = GetCurrentTimeForAddress(Address);
-            data.TimeZoneName = GetTimeZoneInfo(Address).StandardName;
+            data.TimeZoneName = GetTimeZoneInfo(Address, null).StandardName;
             data.Sunrise = GetSunriseSunset(true, Address);
             data.Sunset = GetSunriseSunset(false, Address);
+
+            return data;
+        }
+
+        private ISunriseSunsetData GetByIP(string IPAddress)
+        {
+            var data = new SunriseSunsetData();
+            data.Address = GetCityInfoFromIP(IPAddress);
+            data.IPAddress = IPAddress;
+            data.CurrentTime = GetCurrentTimeForIP(IPAddress);
 
             return data;
         }
@@ -39,7 +61,7 @@ namespace SunriseSunset
             if (sunriseSunsetData != null)
             {
                 DateTime? sunrise = null, sunset = null;
-                var timeZone = GetTimeZoneInfo(Address);
+                var timeZone = GetTimeZoneInfo(Address, null);
 
                 foreach (var item in sunriseSunsetData.sundata)
                 {
@@ -99,9 +121,9 @@ namespace SunriseSunset
         /// </summary>
         /// <param name="Address"></param>
         /// <returns></returns>
-        private string GetLatLong(string Address)
+        private string GetLatLongFromAddress(string Address)
         {
-            string cacheKey = FormatCacheKey("LatLng", Address);
+            string cacheKey = FormatCacheKey("LatLngAddress", Address);
 
             LatLongData latLng = Cache.Get<LatLongData>(cacheKey);
             if (latLng == null)
@@ -117,7 +139,36 @@ namespace SunriseSunset
                 return string.Format("{0},{1}", latLng.results[0].geometry.location.lat, latLng.results[0].geometry.location.lng);
             }
 
-            return string.Empty;
+            return null;
+        }
+
+        private GeoIPData GetGeoIPData(string IPAddress)
+        {
+            string cacheKey = FormatCacheKey("LatLngIP", IPAddress);
+
+            GeoIPData geoIP = Cache.Get<GeoIPData>(cacheKey);
+            if (geoIP == null)
+            {
+                string url = string.Format("http://freegeoip.net/json/{0}", IPAddress);
+                geoIP = GetAsyncResult<GeoIPData>(url);
+            }
+
+            if (geoIP != null)
+            {
+                Cache.Set(cacheKey, geoIP, 43200);
+            }
+
+            return geoIP;
+        }
+
+        private string GetLatLongFromIP(string IPAddress)
+        {
+            var geoIP = GetGeoIPData(IPAddress);
+
+            if (geoIP != null)
+                return string.Format("{0},{1}", geoIP.latitude, geoIP.longitude);
+
+            return null;
         }
 
         /// <summary>
@@ -125,7 +176,7 @@ namespace SunriseSunset
         /// </summary>
         /// <param name="Address"></param>
         /// <returns></returns>
-        private TimeZoneInfo GetTimeZoneInfo(string Address)
+        private TimeZoneInfo GetTimeZoneInfo(string Address, string latLng)
         {
             string cacheKey = FormatCacheKey("Timezone", Address);
 
@@ -133,7 +184,8 @@ namespace SunriseSunset
 
             if (timeZone == null)
             {
-                string latLng = GetLatLong(Address);
+                if (string.IsNullOrEmpty(latLng))
+                    latLng = GetLatLongFromAddress(Address);
 
                 // make sure the lat and long coordinates are not empty before continuing on
                 if (!string.IsNullOrEmpty(latLng))
@@ -181,7 +233,7 @@ namespace SunriseSunset
 
             if (sunriseSunsetData == null)
             {
-                var url = string.Format("http://api.usno.navy.mil/rstt/oneday?date={0}&coords={1}", DateTime.Now.ToString("MM/dd/yyyy"), GetLatLong(Address));
+                var url = string.Format("http://api.usno.navy.mil/rstt/oneday?date={0}&coords={1}", DateTime.Now.ToString("MM/dd/yyyy"), GetLatLongFromAddress(Address));
                 sunriseSunsetData = GetAsyncResult<USNavySunData>(url);
 
                 if (sunriseSunsetData != null)
@@ -199,7 +251,31 @@ namespace SunriseSunset
         /// <returns></returns>
         private DateTime GetCurrentTimeForAddress(string address)
         {
-            var timezone = GetTimeZoneInfo(address);
+            var timezone = GetTimeZoneInfo(address, null);
+
+            DateTime currentTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timezone.StandardName);
+
+            return currentTime;
+        }
+
+        private string GetCityInfoFromIP(string IPAddress)
+        {
+            var geoIP = GetGeoIPData(IPAddress);
+
+            if (geoIP != null)
+                return string.Format("{0}, {1}, {2}, {3}", geoIP.city, geoIP.region_code, geoIP.zip_code, geoIP.country_code);
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the current local time for a given IP Address location
+        /// </summary>
+        /// <param name="IPAddress"></param>
+        /// <returns></returns>
+        private DateTime GetCurrentTimeForIP(string IPAddress)
+        {
+            var timezone = GetTimeZoneInfo(null, GetLatLongFromIP(IPAddress));
 
             DateTime currentTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timezone.StandardName);
 

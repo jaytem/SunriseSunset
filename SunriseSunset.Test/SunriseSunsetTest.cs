@@ -11,6 +11,7 @@ namespace SunriseSunset.Test
     {
         string address;
         SunriseSunsetData invalidAddress;
+        string ipAddress;
 
         private ISunriseSunsetData sut;
 
@@ -20,7 +21,8 @@ namespace SunriseSunset.Test
         public void Setup()
         {
             address = "3817 McCoy Dr. Suite 105 Aurora, IL 60504";
-            invalidAddress = new SunriseSunsetData("aaa");
+            invalidAddress = new SunriseSunsetData();
+            ipAddress = "207.223.36.84";
 
             // Act
             sut = service.Service.Get(address);
@@ -65,7 +67,7 @@ namespace SunriseSunset.Test
         [TestMethod]
         public void SunriseSunset_IsDaytime_Check()
         {
-            SunriseSunsetData data = new SunriseSunsetData(null);
+            SunriseSunsetData data = new SunriseSunsetData();
             data.Sunrise = new DateTime(2017, 01, 01, 06, 00, 00);
             data.Sunset = data.Sunrise.Value.AddHours(12);
             data.CurrentTime = data.Sunrise.Value.AddHours(6);
@@ -77,7 +79,7 @@ namespace SunriseSunset.Test
         [TestMethod]
         public void SunriseSunset_IsNighttime_Check()
         {
-            SunriseSunsetData data = new SunriseSunsetData(null);
+            SunriseSunsetData data = new SunriseSunsetData();
             data.Sunrise = new DateTime(2017, 01, 01, 06, 00, 00);
             data.Sunset = data.Sunrise.Value.AddHours(12);
             data.CurrentTime = data.Sunrise.Value.AddHours(15);
@@ -113,6 +115,16 @@ namespace SunriseSunset.Test
         {
             // Assert
             Assert.IsNull(invalidAddress.TimeZoneName);
+        }
+
+        [TestMethod]
+        public void SunsriseSunset_CurrentTime_GetByIP_IsPopulated()
+        {
+            //Act
+           var data = service.Service.Get(ipAddress);
+
+            // Assert
+            Assert.IsNotNull(data.CurrentTime);
         }
     }
 }
