@@ -16,7 +16,7 @@ namespace SunriseSunset.Models
 
         public string Address { get; }
 
-        public DateTime CurrentTime { get; set; }
+        public DateTime? CurrentTime { get; set; }
 
         public string TimeZoneName { get; set; }
 
@@ -26,7 +26,7 @@ namespace SunriseSunset.Models
 
         public bool IsDaylight(int plusHours = 0)
         {
-            var now = CurrentTime.AddHours(plusHours);
+            var now = CurrentTime?.AddHours(plusHours);
 
             if (now > Sunrise && now < Sunset)
                 return true;

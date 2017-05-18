@@ -10,6 +10,7 @@ namespace SunriseSunset.Test
     public class SunriseSunsetTest
     {
         string address;
+        SunriseSunsetData invalidAddress;
 
         private ISunriseSunsetData sut;
 
@@ -18,7 +19,8 @@ namespace SunriseSunset.Test
         [TestInitialize]
         public void Setup()
         {
-            var address = "3817 McCoy Dr. Suite 105 Aurora, IL 60504";
+            address = "3817 McCoy Dr. Suite 105 Aurora, IL 60504";
+            invalidAddress = new SunriseSunsetData("aaa");
 
             // Act
             sut = service.Service.Get(address);
@@ -86,13 +88,31 @@ namespace SunriseSunset.Test
 
 
         [TestMethod]
-        //[ExpectedException(typeof(NullReferenceException))]
         public void SunriseSunset_Sunrise_IsNull()
         {
-            SunriseSunsetData data = new SunriseSunsetData("aaa");
-
             // Assert
-            Assert.IsNull(data.Sunset);
+            Assert.IsNull(invalidAddress.Sunrise);
+        }
+
+        [TestMethod]
+        public void SunriseSunset_Sunset_IsNull()
+        {
+            // Assert
+            Assert.IsNull(invalidAddress.Sunset);
+        }
+
+        [TestMethod]
+        public void SunriseSunset_CurrentTime_IsNull()
+        {
+            // Assert
+            Assert.IsNull(invalidAddress.CurrentTime);
+        }
+
+        [TestMethod]
+        public void SunriseSunset_TimeZoneName_IsNull()
+        {
+            // Assert
+            Assert.IsNull(invalidAddress.TimeZoneName);
         }
     }
 }
