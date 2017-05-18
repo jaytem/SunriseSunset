@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SunriseSunset.Abstractions;
 using SunriseSunset.Models;
+using DotNetStarter.Abstractions;
 
 namespace SunriseSunset.Test
 {
@@ -9,82 +10,50 @@ namespace SunriseSunset.Test
     public class SunriseSunsetTest
     {
         string address;
-        
+
+        private ISunriseSunsetData sut;
+
+        Import<ISunriseSunsetService> service;
+
         [TestInitialize]
         public void Setup()
         {
-            address = "3817 McCoy Dr. Suite 105 Aurora, IL 60504";
+            var address = "3817 McCoy Dr. Suite 105 Aurora, IL 60504";
 
-            // TODO: set up new USNavyData object with defined values and use for tests
-
-
+            // Act
+            sut = service.Service.Get(address);
         }
-        
+
 
         [TestMethod]
         public void SunriseSunset_OnGetCommand_Sunrise_IsPopulated()
         {
-            DotNetStarter.ApplicationContext.Startup();
-            var locator = DotNetStarter.ApplicationContext.Default.Locator;
-            var service = locator.Get<ISunriseSunsetService>();
-
-            // Arrange
-            ISunriseSunsetData data;
-
-            // Act
-            data = service.Get(address);
-
             // Assert
-            Assert.IsNotNull(data.Sunrise);
+            Assert.IsNotNull(sut.Sunrise);
+            Assert.AreEqual(DateTime.Today.DayOfYear, sut.Sunrise.Value.DayOfYear);
         }
 
         [TestMethod]
         public void SunriseSunset_OnGetCommand_Sunset_IsPopulated()
         {
-            DotNetStarter.ApplicationContext.Startup();
-            var locator = DotNetStarter.ApplicationContext.Default.Locator;
-            var service = locator.Get<ISunriseSunsetService>();
-
-            // Arrange
-            ISunriseSunsetData data;
-
-            // Act
-            data = service.Get(address);
-
             // Assert
-            Assert.IsNotNull(data.Sunset);
+            Assert.IsNotNull(sut.Sunset);
+            Assert.AreEqual(DateTime.Today.DayOfYear, sut.Sunset.Value.DayOfYear);
         }
 
         [TestMethod]
         public void SunsriseSunset_TimezoneName_IsPopulated()
         {
-            DotNetStarter.ApplicationContext.Startup();
-            var locator = DotNetStarter.ApplicationContext.Default.Locator;
-            var service = locator.Get<ISunriseSunsetService>();
-
-            // Arrange
-            ISunriseSunsetData data;
-
-            // Act
-            data = service.Get(address);
-
             // Assert
-            Assert.IsNotNull(data.TimeZoneName);
-            Assert.AreEqual("Central Standard Time", data.TimeZoneName);
+            Assert.IsNotNull(sut.TimeZoneName);
+            Assert.AreEqual("Central Standard Time", sut.TimeZoneName);
         }
 
         [TestMethod]
         public void SunsriseSunset_TimezoneNameTransform_IsCorrect()
         {
-            DotNetStarter.ApplicationContext.Startup();
-            var locator = DotNetStarter.ApplicationContext.Default.Locator;
-            var service = locator.Get<ISunriseSunsetService>();
-
-            // Arrange
-            ISunriseSunsetData data;
-
             // Act
-            data = service.Get("2752 Woodlawn Dr #518, Honolulu, HI 96822");
+            var data = service.Service.Get("2752 Woodlawn Dr #518, Honolulu, HI 96822");
 
             // Assert
             Assert.IsNotNull(data.TimeZoneName);
@@ -94,37 +63,36 @@ namespace SunriseSunset.Test
         [TestMethod]
         public void SunriseSunset_IsDaytime_Check()
         {
-            DotNetStarter.ApplicationContext.Startup();
-            var locator = DotNetStarter.ApplicationContext.Default.Locator;
-            var service = locator.Get<ISunriseSunsetService>();
-
-            // Arrange
-            ISunriseSunsetData data;
-
-            // Act
-            data = service.Get(address);
+            SunriseSunsetData data = new SunriseSunsetData(null);
+            data.Sunrise = new DateTime(2017, 01, 01, 06, 00, 00);
+            data.Sunset = data.Sunrise.Value.AddHours(12);
+            data.CurrentTime = data.Sunrise.Value.AddHours(6);
 
             // Assert
-            Assert.IsNotNull(data.IsDaylight());
             Assert.AreEqual(true, data.IsDaylight());
         }
 
         [TestMethod]
         public void SunriseSunset_IsNighttime_Check()
         {
-            DotNetStarter.ApplicationContext.Startup();
-            var locator = DotNetStarter.ApplicationContext.Default.Locator;
-            var service = locator.Get<ISunriseSunsetService>();
-
-            // Arrange
-            ISunriseSunsetData data;
-
-            // Act
-            data = service.Get(address);
+            SunriseSunsetData data = new SunriseSunsetData(null);
+            data.Sunrise = new DateTime(2017, 01, 01, 06, 00, 00);
+            data.Sunset = data.Sunrise.Value.AddHours(12);
+            data.CurrentTime = data.Sunrise.Value.AddHours(15);
 
             // Assert
-            Assert.IsNotNull(data.IsDaylight());
             Assert.AreEqual(false, data.IsDaylight());
+        }
+
+
+        [TestMethod]
+        //[ExpectedException(typeof(NullReferenceException))]
+        public void SunriseSunset_Sunrise_IsNull()
+        {
+            SunriseSunsetData data = new SunriseSunsetData("aaa");
+
+            // Assert
+            Assert.IsNull(data.Sunset);
         }
     }
 }

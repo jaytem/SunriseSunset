@@ -31,16 +31,16 @@ namespace SunriseSunset
 
         #region Private Functions
 
-        private DateTime GetSunriseSunset(bool getSunrise, string Address)
+        private DateTime? GetSunriseSunset(bool getSunrise, string Address)
         {
-            var sunrise = DateTime.Today.AddHours(6); // set default sunrise for 6:00 AM
-            var sunset = DateTime.Today.AddHours(18); // set default sunset for 6:00 PM
-            var timeZone = GetTimeZoneInfo(Address);
             USNavySunData sunriseSunsetData = GetSunriseSunsetDataFromNavy(Address);
 
             // Get today's sunrise and sunset from USNavySunData object
             if (sunriseSunsetData != null)
             {
+                DateTime? sunrise = null, sunset = null;
+                var timeZone = GetTimeZoneInfo(Address);
+
                 foreach (var item in sunriseSunsetData.sundata)
                 {
                     if (item.phen == "R")
@@ -50,17 +50,23 @@ namespace SunriseSunset
                         sunset = TimeZoneInfo.ConvertTimeFromUtc(DateTime.Parse(item.time), timeZone);
                 }
 
-                /* Due to summer tiems and UTC offset, the sunset was coming out after midnight UTC, but was being set to the same date
-                 * so sunset was showing as before sunrise. Adding a day to account for this anomoly
-                 */
-                if (sunrise > sunset)
-                    sunset = sunset.AddDays(1);
+                if (sunrise != null && sunset != null)
+                {
+                    /* Due to summer tiems and UTC offset, the sunset was coming out after midnight UTC, but was being set to the same date
+                     * so sunset was showing as before sunrise. Adding a day to account for this anomoly
+                     */
+                    if (sunrise > sunset)
+                        sunset = sunset.Value.AddDays(1);
+
+                    if (getSunrise)
+                        return sunrise;
+
+                    return sunset;
+                }
             }
 
-            if (getSunrise)
-                return sunrise;
-
-            return sunset;
+            return null;
+            
         }
 
         /// <summary>
