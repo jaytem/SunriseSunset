@@ -4,18 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SunriseSunset.Abstractions;
+using System.Net;
 
 namespace SunriseSunset.Models
 {
     public class SunriseSunsetData : ISunriseSunsetData
     {
-        public SunriseSunsetData()
-        { }
+        public SunriseSunsetData(string address, IPAddress ipAddress)
+        {
+            Address = address;
+
+            if (ipAddress != null)
+                IPAddress = ipAddress.ToString();
+        }
            
+        public string Address { get; }
 
-        public string Address { get; set; }
-
-        public string IPAddress { get; set; }
+        public string IPAddress { get; }
 
         public string LatLong { get; set; }
 

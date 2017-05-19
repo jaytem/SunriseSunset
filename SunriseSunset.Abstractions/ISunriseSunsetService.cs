@@ -1,7 +1,11 @@
-﻿namespace SunriseSunset.Abstractions
+﻿using System.Net;
+
+namespace SunriseSunset.Abstractions
 {
     public interface ISunriseSunsetService
     {
-        ISunriseSunsetData Get(string Address);
+        ISunriseSunsetData GetByAddress(string Address);
+
+        ISunriseSunsetData GetByIP(IPAddress IpAddress);
     }
 }

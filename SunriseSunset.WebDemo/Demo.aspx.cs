@@ -2,6 +2,8 @@
 using DotNetStarter.Abstractions;
 using SunriseSunset.Abstractions;
 using System.Text;
+using System.Net;
+using SunriseSunset.Models;
 
 namespace SunriseSunset.WebDemo
 {
@@ -26,12 +28,16 @@ namespace SunriseSunset.WebDemo
             if (IP == "127.0.0.1")
                 IP = "207.223.36.84";
 
+            IPAddress ipAddress;
+            IPAddress.TryParse(IP, out ipAddress);
+          
+
             //Start time for lookup run time
             DateTime startTime = DateTime.Now;
 
             StringBuilder output = new StringBuilder();
 
-            output.Append(GetSunriseSunsetData(IP));
+            output.Append(GetSunriseSunsetData(null, ipAddress));
             
 
             // End time for lookup run time
@@ -61,7 +67,7 @@ namespace SunriseSunset.WebDemo
 
             foreach (var addr in addressList)
             {
-                output.Append(GetSunriseSunsetData(addr));
+                output.Append(GetSunriseSunsetData(addr, null));
             }
 
             // End time for lookup run time
@@ -73,22 +79,33 @@ namespace SunriseSunset.WebDemo
         }
 
 
-        private string GetSunriseSunsetData(string addr)
+        private string GetSunriseSunsetData(string addr, IPAddress ipAddress)
         {
             int plusHours = int.Parse(txtPlusHours.Text.Trim());
-            ISunriseSunsetData data = _SunriseSunsetService.Service.Get(addr);
+            ISunriseSunsetData data = new SunriseSunsetData(null, null);
 
-            return string.Format("Address: {0}<br />IP Address: {7}<br />Lat/Long: {8}<br />TimeZone: {1}<br />Sunrise: {2}<br />Sunset: {3}<br />Current local time: {5}<br />Test local time: {6}<br />IsDay: {4}<br /><br />",
-                data.Address,
-                data.TimeZoneName,
-                data.Sunrise,
-                data.Sunset,
-                data.IsDaylight(plusHours),
-                data.CurrentTime,
-                data.CurrentTime.Value.AddHours(plusHours), 
-                data.IPAddress, 
-                data.LatLong);
+            if (!string.IsNullOrEmpty(addr))
+                data = _SunriseSunsetService.Service.GetByAddress(addr);
+            else if (ipAddress != null)
+                data = _SunriseSunsetService.Service.GetByIP(ipAddress);
 
+            
+
+            if (data.Address != null)
+            {
+                return string.Format("Address: {0}<br />IP Address: {7}<br />Lat/Long: {8}<br />TimeZone: {1}<br />Sunrise: {2}<br />Sunset: {3}<br />Current local time: {5}<br />Test local time: {6}<br />IsDay: {4}<br /><br />",
+                    data.Address,
+                    data.TimeZoneName,
+                    data.Sunrise,
+                    data.Sunset,
+                    data.IsDaylight(plusHours),
+                    data.CurrentTime,
+                    data.CurrentTime.Value.AddHours(plusHours),
+                    data.IPAddress,
+                    data.LatLong);
+            }
+
+            return null;
         }
 
         protected void btnClear_Click(object sender, EventArgs e)

@@ -4,9 +4,9 @@ namespace SunriseSunset.Abstractions
 {
     public interface ISunriseSunsetData
     {
-        string Address { get; set; }
+        string Address { get; }
 
-        string IPAddress { get; set; }
+        string IPAddress { get; }
         
         string LatLong { get; set; }
 

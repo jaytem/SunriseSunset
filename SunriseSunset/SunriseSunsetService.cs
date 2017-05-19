@@ -19,24 +19,26 @@ namespace SunriseSunset
             _transformers = transformers;
         }
 
-        public ISunriseSunsetData Get(string Address)
+        public ISunriseSunsetData GetByAddress(string Address)
+        {
+            string latLng = GetLatLongFromAddress(Address);
+
+            var data = new SunriseSunsetData(Address, null);
+            data.LatLong = latLng;
+            data.CurrentTime = GetCurrentTime(latLng);
+            data.TimeZoneName = GetTimeZoneInfo(latLng).StandardName;
+            data.Sunrise = GetSunriseSunset(true, latLng);
+            data.Sunset = GetSunriseSunset(false, latLng);
+
+            return data;
+        }
+
+        public ISunriseSunsetData GetByIP(IPAddress IpAddress)
         {
             string latLng;
-            var data = new SunriseSunsetData();
+            latLng = GetLatLongFromIP(IpAddress.ToString());
 
-            IPAddress ipAddress;
-            if (IPAddress.TryParse(Address, out ipAddress))
-            {
-                latLng = GetLatLongFromIP(ipAddress.ToString());
-                data.Address = GetCityInfoFromIP(ipAddress.ToString());
-                data.IPAddress = ipAddress.ToString();
-            }
-            else
-            {
-                data.Address = Address;
-                latLng = GetLatLongFromAddress(Address);
-            }
-             
+            var data = new SunriseSunsetData(GetCityInfoFromIP(IpAddress.ToString()), IpAddress);
             data.LatLong = latLng;
             data.CurrentTime = GetCurrentTime(latLng);
             data.TimeZoneName = GetTimeZoneInfo(latLng).StandardName;
@@ -89,7 +91,7 @@ namespace SunriseSunset
             }
 
             return null;
-            
+
         }
 
         /// <summary>
@@ -255,7 +257,7 @@ namespace SunriseSunset
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        private DateTime GetCurrentTime(string LatLng)
+        public DateTime GetCurrentTime(string LatLng)
         {
             var timezone = GetTimeZoneInfo(LatLng);
 

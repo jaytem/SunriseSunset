@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SunriseSunset.Abstractions;
 using SunriseSunset.Models;
 using DotNetStarter.Abstractions;
+using System.Net;
 
 namespace SunriseSunset.Test
 {
@@ -22,12 +23,16 @@ namespace SunriseSunset.Test
         public void Setup()
         {
             address = "3817 McCoy Dr. Suite 105 Aurora, IL 60504";
-            invalidAddress = new SunriseSunsetData();
-            ipAddress = "207.223.36.84";
+            invalidAddress = new SunriseSunsetData("123", null);
+
+
+            IPAddress ipAddress;
+            IPAddress.TryParse("207.223.36.84", out ipAddress);
+
 
             // Act
-            sut = service.Service.Get(address);
-            sutIP = service.Service.Get(ipAddress);
+            sut = service.Service.GetByAddress(address);
+            sutIP = service.Service.GetByIP(ipAddress);
         }
 
 
@@ -83,7 +88,7 @@ namespace SunriseSunset.Test
         public void SunsriseSunset_TimezoneNameTransform_IsCorrect()
         {
             // Act
-            var data = service.Service.Get("2752 Woodlawn Dr #518, Honolulu, HI 96822");
+            var data = service.Service.GetByAddress("2752 Woodlawn Dr #518, Honolulu, HI 96822");
 
             // Assert
             Assert.IsNotNull(data.TimeZoneName);
@@ -93,7 +98,7 @@ namespace SunriseSunset.Test
         [TestMethod]
         public void SunriseSunset_IsDaytime_Check()
         {
-            SunriseSunsetData data = new SunriseSunsetData();
+            SunriseSunsetData data = new SunriseSunsetData(address, null);
             data.Sunrise = new DateTime(2017, 01, 01, 06, 00, 00);
             data.Sunset = data.Sunrise.Value.AddHours(12);
             data.CurrentTime = data.Sunrise.Value.AddHours(6);
@@ -105,7 +110,7 @@ namespace SunriseSunset.Test
         [TestMethod]
         public void SunriseSunset_IsNighttime_Check()
         {
-            SunriseSunsetData data = new SunriseSunsetData();
+            SunriseSunsetData data = new SunriseSunsetData(address, null);
             data.Sunrise = new DateTime(2017, 01, 01, 06, 00, 00);
             data.Sunset = data.Sunrise.Value.AddHours(12);
             data.CurrentTime = data.Sunrise.Value.AddHours(15);
@@ -156,6 +161,6 @@ namespace SunriseSunset.Test
             Assert.IsNull(invalidAddress.TimeZoneName);
         }
 
-        
+
     }
 }

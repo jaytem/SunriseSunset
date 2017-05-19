@@ -1,5 +1,6 @@
 ﻿using SunriseSunset.Abstractions;
 using System;
+using System.Net;
 
 namespace SunriseSunset.ConsoleDemo
 {
@@ -11,8 +12,9 @@ namespace SunriseSunset.ConsoleDemo
             var locator = DotNetStarter.ApplicationContext.Default.Locator;
             var service = locator.Get<ISunriseSunsetService>();
 
-            var IP = "207.223.36.84";
-            var ipData = service.Get(IP);
+            IPAddress ipAddress;
+            IPAddress.TryParse("207.223.36.84", out ipAddress);
+            var ipData = service.GetByIP(ipAddress);
 
             Console.WriteLine(string.Format("By IP Address{1}Address: {0}{1}IP Address:{8}{1}TimeZone: {5}{1}Lat/Long: {7}{1}Sunrise: {2}{1}Sunset: {3}{1}Current local time: {6}{1}IsDay: {4}{1}{1}",
                     ipData.Address,
@@ -40,7 +42,7 @@ namespace SunriseSunset.ConsoleDemo
 
             foreach (var addr in Addresses)
             {
-                var data = service.Get(addr);
+                var data = service.GetByAddress(addr);
 
                 Console.WriteLine(string.Format("Address: {0}{1}TimeZone: {5}{1}Lat/Long: {7}{1}Sunrise: {2}{1}Sunset: {3}{1}Current local time: {6}{1}IsDay: {4}{1}{1}",
                     data.Address,
