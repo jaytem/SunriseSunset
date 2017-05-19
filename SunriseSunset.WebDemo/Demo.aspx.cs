@@ -78,7 +78,7 @@ namespace SunriseSunset.WebDemo
             int plusHours = int.Parse(txtPlusHours.Text.Trim());
             ISunriseSunsetData data = _SunriseSunsetService.Service.Get(addr);
 
-            return string.Format("Address: {0}<br />IP Address: {7}<br />TimeZone: {1}<br />Sunrise: {2}<br />Sunset: {3}<br />Current local time: {5}<br />Test local time: {6}<br />IsDay: {4}<br /><br />",
+            return string.Format("Address: {0}<br />IP Address: {7}<br />Lat/Long: {8}<br />TimeZone: {1}<br />Sunrise: {2}<br />Sunset: {3}<br />Current local time: {5}<br />Test local time: {6}<br />IsDay: {4}<br /><br />",
                 data.Address,
                 data.TimeZoneName,
                 data.Sunrise,
@@ -86,7 +86,8 @@ namespace SunriseSunset.WebDemo
                 data.IsDaylight(plusHours),
                 data.CurrentTime,
                 data.CurrentTime.Value.AddHours(plusHours), 
-                data.IPAddress);
+                data.IPAddress, 
+                data.LatLong);
 
         }
 

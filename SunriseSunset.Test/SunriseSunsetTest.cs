@@ -14,6 +14,7 @@ namespace SunriseSunset.Test
         string ipAddress;
 
         private ISunriseSunsetData sut;
+        private ISunriseSunsetData sutIP;
 
         Import<ISunriseSunsetService> service;
 
@@ -26,11 +27,12 @@ namespace SunriseSunset.Test
 
             // Act
             sut = service.Service.Get(address);
+            sutIP = service.Service.Get(ipAddress);
         }
 
 
         [TestMethod]
-        public void SunriseSunset_OnGetCommand_Sunrise_IsPopulated()
+        public void SunriseSunset_OnGetCommand_SunriseByAddress_IsPopulated()
         {
             // Assert
             Assert.IsNotNull(sut.Sunrise);
@@ -38,7 +40,15 @@ namespace SunriseSunset.Test
         }
 
         [TestMethod]
-        public void SunriseSunset_OnGetCommand_Sunset_IsPopulated()
+        public void SunriseSunset_OnGetCommand_SunriseByIP_IsPopulated()
+        {
+            // Assert
+            Assert.IsNotNull(sutIP.Sunrise);
+            Assert.AreEqual(DateTime.Today.DayOfYear, sutIP.Sunrise.Value.DayOfYear);
+        }
+
+        [TestMethod]
+        public void SunriseSunset_OnGetCommand_SunsetByAddress_IsPopulated()
         {
             // Assert
             Assert.IsNotNull(sut.Sunset);
@@ -46,11 +56,27 @@ namespace SunriseSunset.Test
         }
 
         [TestMethod]
-        public void SunsriseSunset_TimezoneName_IsPopulated()
+        public void SunriseSunset_OnGetCommand_SunsetByIP_IsPopulated()
+        {
+            // Assert
+            Assert.IsNotNull(sutIP.Sunset);
+            Assert.AreEqual(DateTime.Today.DayOfYear, sutIP.Sunset.Value.DayOfYear);
+        }
+
+        [TestMethod]
+        public void SunsriseSunset_TimezoneNameByAddress_IsPopulated()
         {
             // Assert
             Assert.IsNotNull(sut.TimeZoneName);
             Assert.AreEqual("Central Standard Time", sut.TimeZoneName);
+        }
+
+        [TestMethod]
+        public void SunsriseSunset_TimezoneNameByIP_IsPopulated()
+        {
+            // Assert
+            Assert.IsNotNull(sutIP.TimeZoneName);
+            Assert.AreEqual("Central Standard Time", sutIP.TimeZoneName);
         }
 
         [TestMethod]
@@ -88,6 +114,19 @@ namespace SunriseSunset.Test
             Assert.AreEqual(false, data.IsDaylight());
         }
 
+        [TestMethod]
+        public void SunsriseSunset_CurrentTimeByAddress_IsPopulated()
+        {
+            // Assert
+            Assert.IsNotNull(sut.CurrentTime);
+        }
+
+        [TestMethod]
+        public void SunsriseSunset_CurrentTimeByIP_IsPopulated()
+        {
+            // Assert
+            Assert.IsNotNull(sutIP.CurrentTime);
+        }
 
         [TestMethod]
         public void SunriseSunset_Sunrise_IsNull()
@@ -104,7 +143,7 @@ namespace SunriseSunset.Test
         }
 
         [TestMethod]
-        public void SunriseSunset_CurrentTime_IsNull()
+        public void SunriseSunset_CurrentTime_GetByAddress_IsNull()
         {
             // Assert
             Assert.IsNull(invalidAddress.CurrentTime);
@@ -117,14 +156,6 @@ namespace SunriseSunset.Test
             Assert.IsNull(invalidAddress.TimeZoneName);
         }
 
-        [TestMethod]
-        public void SunsriseSunset_CurrentTime_GetByIP_IsPopulated()
-        {
-            //Act
-           var data = service.Service.Get(ipAddress);
-
-            // Assert
-            Assert.IsNotNull(data.CurrentTime);
-        }
+        
     }
 }
