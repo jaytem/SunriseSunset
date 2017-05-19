@@ -17,9 +17,7 @@ namespace SunriseSunset.Models
 
         public string IPAddress { get; set; }
 
-        public string Latitude { get; set; }
-
-        public string Longitude { get; set; }
+        public string LatLong { get; set; }
 
         public DateTime? CurrentTime { get; set; }
 

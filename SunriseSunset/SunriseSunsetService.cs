@@ -21,35 +21,23 @@ namespace SunriseSunset
 
         public ISunriseSunsetData Get(string Address)
         {
+            string latLng;
+            var data = new SunriseSunsetData();
+
             IPAddress ipAddress;
             if (IPAddress.TryParse(Address, out ipAddress))
-                return GetByIP(Address);
-                
-
-            return GetByStreetAddress(Address);
-        }
-
-        private ISunriseSunsetData GetByStreetAddress(string Address)
-        {
-            var latLng = GetLatLongFromAddress(Address);
-
-            var data = new SunriseSunsetData();
-            data.Address = Address;
-            data.CurrentTime = GetCurrentTime(latLng);
-            data.TimeZoneName = GetTimeZoneInfo(latLng).StandardName;
-            data.Sunrise = GetSunriseSunset(true, latLng);
-            data.Sunset = GetSunriseSunset(false, latLng);
-
-            return data;
-        }
-
-        private ISunriseSunsetData GetByIP(string IPAddress)
-        {
-            var latLng = GetLatLongFromIP(IPAddress);
-
-            var data = new SunriseSunsetData();
-            data.Address = GetCityInfoFromIP(IPAddress);
-            data.IPAddress = IPAddress;
+            {
+                latLng = GetLatLongFromIP(ipAddress.ToString());
+                data.Address = GetCityInfoFromIP(ipAddress.ToString());
+                data.IPAddress = ipAddress.ToString();
+            }
+            else
+            {
+                data.Address = Address;
+                latLng = GetLatLongFromAddress(Address);
+            }
+             
+            data.LatLong = latLng;
             data.CurrentTime = GetCurrentTime(latLng);
             data.TimeZoneName = GetTimeZoneInfo(latLng).StandardName;
             data.Sunrise = GetSunriseSunset(true, latLng);
@@ -60,6 +48,12 @@ namespace SunriseSunset
 
         #region Private Functions
 
+        /// <summary>
+        /// Returns the sunrise or sunset datetime for given latitude and longitude coordates
+        /// </summary>
+        /// <param name="getSunrise"></param>
+        /// <param name="LatLng"></param>
+        /// <returns></returns>
         private DateTime? GetSunriseSunset(bool getSunrise, string LatLng)
         {
             USNavySunData sunriseSunsetData = GetSunriseSunsetDataFromNavy(LatLng);
@@ -96,6 +90,30 @@ namespace SunriseSunset
 
             return null;
             
+        }
+
+        /// <summary>
+        /// Get the Geographical data for a given IP Address from freegeoip.net
+        /// </summary>
+        /// <param name="IPAddress"></param>
+        /// <returns></returns>
+        private GeoIPData GetGeoIPData(string IPAddress)
+        {
+            string cacheKey = FormatCacheKey("LatLngIP", IPAddress);
+
+            GeoIPData geoIP = Cache.Get<GeoIPData>(cacheKey);
+            if (geoIP == null)
+            {
+                string url = string.Format("http://freegeoip.net/json/{0}", IPAddress);
+                geoIP = GetAsyncResult<GeoIPData>(url);
+            }
+
+            if (geoIP != null)
+            {
+                Cache.Set(cacheKey, geoIP, 43200);
+            }
+
+            return geoIP;
         }
 
         /// <summary>
@@ -149,25 +167,11 @@ namespace SunriseSunset
             return null;
         }
 
-        private GeoIPData GetGeoIPData(string IPAddress)
-        {
-            string cacheKey = FormatCacheKey("LatLngIP", IPAddress);
-
-            GeoIPData geoIP = Cache.Get<GeoIPData>(cacheKey);
-            if (geoIP == null)
-            {
-                string url = string.Format("http://freegeoip.net/json/{0}", IPAddress);
-                geoIP = GetAsyncResult<GeoIPData>(url);
-            }
-
-            if (geoIP != null)
-            {
-                Cache.Set(cacheKey, geoIP, 43200);
-            }
-
-            return geoIP;
-        }
-
+        /// <summary>
+        /// Get the Latitude and Longitude for a given IP address
+        /// </summary>
+        /// <param name="IPAddress"></param>
+        /// <returns></returns>
         private string GetLatLongFromIP(string IPAddress)
         {
             var geoIP = GetGeoIPData(IPAddress);
@@ -246,9 +250,8 @@ namespace SunriseSunset
             return sunriseSunsetData;
         }
 
-
         /// <summary>
-        /// Returns the current local time for a given address
+        /// Returns the current local time for given latitude and longitude coordinates
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
@@ -261,6 +264,11 @@ namespace SunriseSunset
             return currentTime;
         }
 
+        /// <summary>
+        /// Returns a string with the general city,state, zipcode, and country code based on a give IP Address
+        /// </summary>
+        /// <param name="IPAddress"></param>
+        /// <returns></returns>
         private string GetCityInfoFromIP(string IPAddress)
         {
             var geoIP = GetGeoIPData(IPAddress);
@@ -271,12 +279,15 @@ namespace SunriseSunset
             return null;
         }
 
-       
-
         #endregion
 
         #region Helper Functions
 
+        /// <summary>
+        /// Runs the time zone name through all of the transforms, to account for known differences between retrieved and expected time zone names
+        /// </summary>
+        /// <param name="TimeZoneName"></param>
+        /// <returns></returns>
         private IEnumerable<ITimezoneNameTransform> _transformers;
         private string TransformTimeZoneName(string TimeZoneName)
         {
@@ -287,9 +298,15 @@ namespace SunriseSunset
             return temp;
         }
 
-        private string FormatCacheKey(string key, string address)
+        /// <summary>
+        /// Returns a standardized cache key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        private string FormatCacheKey(string key, string latlng)
         {
-            return string.Format("Custom:Cache:{0}:Address={1}", key, HttpUtility.UrlEncode(address));
+            return string.Format("Custom:Cache:{0}:LatLong={1}", key, HttpUtility.UrlEncode(latlng));
         }
 
         #endregion

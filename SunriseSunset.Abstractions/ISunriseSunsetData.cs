@@ -8,9 +8,7 @@ namespace SunriseSunset.Abstractions
 
         string IPAddress { get; set; }
         
-        string Latitude { get; set; }
-
-        string Longitude { get; set; }
+        string LatLong { get; set; }
 
         string TimeZoneName { get; set; }
 
