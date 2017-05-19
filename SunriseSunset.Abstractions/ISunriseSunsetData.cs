@@ -12,7 +12,7 @@ namespace SunriseSunset.Abstractions
 
         string TimeZoneName { get; set; }
 
-        DateTime? CurrentTime { get; set; }
+        DateTime CurrentTime();
 
         DateTime? Sunrise { get; set; }
 

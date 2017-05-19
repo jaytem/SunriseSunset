@@ -25,7 +25,6 @@ namespace SunriseSunset
 
             var data = new SunriseSunsetData(Address, null);
             data.LatLong = latLng;
-            data.CurrentTime = GetCurrentTime(latLng);
             data.TimeZoneName = GetTimeZoneInfo(latLng).StandardName;
             data.Sunrise = GetSunriseSunset(true, latLng);
             data.Sunset = GetSunriseSunset(false, latLng);
@@ -40,7 +39,6 @@ namespace SunriseSunset
 
             var data = new SunriseSunsetData(GetCityInfoFromIP(IpAddress.ToString()), IpAddress);
             data.LatLong = latLng;
-            data.CurrentTime = GetCurrentTime(latLng);
             data.TimeZoneName = GetTimeZoneInfo(latLng).StandardName;
             data.Sunrise = GetSunriseSunset(true, latLng);
             data.Sunset = GetSunriseSunset(false, latLng);
@@ -252,19 +250,6 @@ namespace SunriseSunset
             return sunriseSunsetData;
         }
 
-        /// <summary>
-        /// Returns the current local time for given latitude and longitude coordinates
-        /// </summary>
-        /// <param name="address"></param>
-        /// <returns></returns>
-        public DateTime GetCurrentTime(string LatLng)
-        {
-            var timezone = GetTimeZoneInfo(LatLng);
-
-            DateTime currentTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timezone.StandardName);
-
-            return currentTime;
-        }
 
         /// <summary>
         /// Returns a string with the general city,state, zipcode, and country code based on a give IP Address

@@ -23,7 +23,7 @@ namespace SunriseSunset.ConsoleDemo
                     ipData.Sunset,
                     ipData.IsDaylight(0).ToString(),
                     ipData.TimeZoneName,
-                    ipData.CurrentTime,
+                    ipData.CurrentTime(),
                     ipData.LatLong,
                     ipData.IPAddress));
 
@@ -51,7 +51,7 @@ namespace SunriseSunset.ConsoleDemo
                     data.Sunset,
                     data.IsDaylight(0).ToString(),
                     data.TimeZoneName,
-                    data.CurrentTime,
+                    data.CurrentTime(),
                     data.LatLong));
                 
             }

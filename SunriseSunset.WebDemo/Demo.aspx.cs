@@ -99,8 +99,8 @@ namespace SunriseSunset.WebDemo
                     data.Sunrise,
                     data.Sunset,
                     data.IsDaylight(plusHours),
-                    data.CurrentTime,
-                    data.CurrentTime.Value.AddHours(plusHours),
+                    data.CurrentTime(),
+                    data.CurrentTime().AddHours(plusHours),
                     data.IPAddress,
                     data.LatLong);
             }

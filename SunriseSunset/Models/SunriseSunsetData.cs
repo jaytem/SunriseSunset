@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SunriseSunset.Abstractions;
 using System.Net;
 
@@ -24,7 +20,15 @@ namespace SunriseSunset.Models
 
         public string LatLong { get; set; }
 
-        public DateTime? CurrentTime { get; set; }
+        public DateTime CurrentTime()
+        {
+            var currentTime = DateTime.MinValue;
+            
+            if (!string.IsNullOrEmpty(TimeZoneName))
+                currentTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, TimeZoneName);
+
+            return currentTime;
+        }
 
         public string TimeZoneName { get; set; }
 
@@ -34,7 +38,9 @@ namespace SunriseSunset.Models
 
         public bool IsDaylight(int plusHours = 0)
         {
-            var now = CurrentTime?.AddHours(plusHours);
+            var currentTime = CurrentTime();
+
+            var now = currentTime.AddHours(plusHours);
 
             if (now > Sunrise && now < Sunset)
                 return true;
