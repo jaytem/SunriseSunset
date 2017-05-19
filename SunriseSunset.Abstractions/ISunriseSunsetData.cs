@@ -7,6 +7,10 @@ namespace SunriseSunset.Abstractions
         string Address { get; set; }
 
         string IPAddress { get; set; }
+        
+        string Latitude { get; set; }
+
+        string Longitude { get; set; }
 
         string TimeZoneName { get; set; }
 
