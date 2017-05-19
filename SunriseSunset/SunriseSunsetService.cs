@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net;
 using System.Web;
 
 namespace SunriseSunset
@@ -20,26 +21,48 @@ namespace SunriseSunset
 
         public ISunriseSunsetData Get(string Address)
         {
-            var data = new SunriseSunsetData(Address);
-            data.CurrentTime = GetCurrentTimeForAddress(Address);
-            data.TimeZoneName = GetTimeZoneInfo(Address).StandardName;
-            data.Sunrise = GetSunriseSunset(true, Address);
-            data.Sunset = GetSunriseSunset(false, Address);
+            string latLng;
+            var data = new SunriseSunsetData();
+
+            IPAddress ipAddress;
+            if (IPAddress.TryParse(Address, out ipAddress))
+            {
+                latLng = GetLatLongFromIP(ipAddress.ToString());
+                data.Address = GetCityInfoFromIP(ipAddress.ToString());
+                data.IPAddress = ipAddress.ToString();
+            }
+            else
+            {
+                data.Address = Address;
+                latLng = GetLatLongFromAddress(Address);
+            }
+             
+            data.LatLong = latLng;
+            data.CurrentTime = GetCurrentTime(latLng);
+            data.TimeZoneName = GetTimeZoneInfo(latLng).StandardName;
+            data.Sunrise = GetSunriseSunset(true, latLng);
+            data.Sunset = GetSunriseSunset(false, latLng);
 
             return data;
         }
 
         #region Private Functions
 
-        private DateTime? GetSunriseSunset(bool getSunrise, string Address)
+        /// <summary>
+        /// Returns the sunrise or sunset datetime for given latitude and longitude coordates
+        /// </summary>
+        /// <param name="getSunrise"></param>
+        /// <param name="LatLng"></param>
+        /// <returns></returns>
+        private DateTime? GetSunriseSunset(bool getSunrise, string LatLng)
         {
-            USNavySunData sunriseSunsetData = GetSunriseSunsetDataFromNavy(Address);
+            USNavySunData sunriseSunsetData = GetSunriseSunsetDataFromNavy(LatLng);
 
             // Get today's sunrise and sunset from USNavySunData object
             if (sunriseSunsetData != null)
             {
                 DateTime? sunrise = null, sunset = null;
-                var timeZone = GetTimeZoneInfo(Address);
+                var timeZone = GetTimeZoneInfo(LatLng);
 
                 foreach (var item in sunriseSunsetData.sundata)
                 {
@@ -67,6 +90,30 @@ namespace SunriseSunset
 
             return null;
             
+        }
+
+        /// <summary>
+        /// Get the Geographical data for a given IP Address from freegeoip.net
+        /// </summary>
+        /// <param name="IPAddress"></param>
+        /// <returns></returns>
+        private GeoIPData GetGeoIPData(string IPAddress)
+        {
+            string cacheKey = FormatCacheKey("LatLngIP", IPAddress);
+
+            GeoIPData geoIP = Cache.Get<GeoIPData>(cacheKey);
+            if (geoIP == null)
+            {
+                string url = string.Format("http://freegeoip.net/json/{0}", IPAddress);
+                geoIP = GetAsyncResult<GeoIPData>(url);
+            }
+
+            if (geoIP != null)
+            {
+                Cache.Set(cacheKey, geoIP, 43200);
+            }
+
+            return geoIP;
         }
 
         /// <summary>
@@ -99,9 +146,9 @@ namespace SunriseSunset
         /// </summary>
         /// <param name="Address"></param>
         /// <returns></returns>
-        private string GetLatLong(string Address)
+        private string GetLatLongFromAddress(string Address)
         {
-            string cacheKey = FormatCacheKey("LatLng", Address);
+            string cacheKey = FormatCacheKey("LatLngAddress", Address);
 
             LatLongData latLng = Cache.Get<LatLongData>(cacheKey);
             if (latLng == null)
@@ -117,24 +164,37 @@ namespace SunriseSunset
                 return string.Format("{0},{1}", latLng.results[0].geometry.location.lat, latLng.results[0].geometry.location.lng);
             }
 
-            return string.Empty;
+            return null;
         }
 
         /// <summary>
-        /// Get a System.TimeZoneInfo object for a given address
+        /// Get the Latitude and Longitude for a given IP address
+        /// </summary>
+        /// <param name="IPAddress"></param>
+        /// <returns></returns>
+        private string GetLatLongFromIP(string IPAddress)
+        {
+            var geoIP = GetGeoIPData(IPAddress);
+
+            if (geoIP != null)
+                return string.Format("{0},{1}", geoIP.latitude, geoIP.longitude);
+
+            return null;
+        }
+
+        /// <summary>
+        /// Get a System.TimeZoneInfo object for given latitude and longitude corrdinates
         /// </summary>
         /// <param name="Address"></param>
         /// <returns></returns>
-        private TimeZoneInfo GetTimeZoneInfo(string Address)
+        private TimeZoneInfo GetTimeZoneInfo(string latLng)
         {
-            string cacheKey = FormatCacheKey("Timezone", Address);
+            string cacheKey = FormatCacheKey("Timezone", latLng);
 
             TimeZoneInfo timeZone = Cache.Get<TimeZoneInfo>(cacheKey);
 
             if (timeZone == null)
             {
-                string latLng = GetLatLong(Address);
-
                 // make sure the lat and long coordinates are not empty before continuing on
                 if (!string.IsNullOrEmpty(latLng))
                 {
@@ -172,16 +232,15 @@ namespace SunriseSunset
         /// </summary>
         /// <param name="Address"></param>
         /// <returns></returns>
-        private USNavySunData GetSunriseSunsetDataFromNavy(string Address)
+        private USNavySunData GetSunriseSunsetDataFromNavy(string latLng)
         {
             // Get the Sunrise/Sunset data from the US Navy web service api
-            string cacheKey = FormatCacheKey("USNavySunriseSunset", Address);
-
+            string cacheKey = FormatCacheKey("USNavySunriseSunset", latLng);
             USNavySunData sunriseSunsetData = Cache.Get<USNavySunData>(cacheKey);
 
             if (sunriseSunsetData == null)
             {
-                var url = string.Format("http://api.usno.navy.mil/rstt/oneday?date={0}&coords={1}", DateTime.Now.ToString("MM/dd/yyyy"), GetLatLong(Address));
+                var url = string.Format("http://api.usno.navy.mil/rstt/oneday?date={0}&coords={1}", DateTime.Now.ToString("MM/dd/yyyy"), latLng);
                 sunriseSunsetData = GetAsyncResult<USNavySunData>(url);
 
                 if (sunriseSunsetData != null)
@@ -191,25 +250,44 @@ namespace SunriseSunset
             return sunriseSunsetData;
         }
 
-
         /// <summary>
-        /// Returns the current local time for a given address
+        /// Returns the current local time for given latitude and longitude coordinates
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        private DateTime GetCurrentTimeForAddress(string address)
+        private DateTime GetCurrentTime(string LatLng)
         {
-            var timezone = GetTimeZoneInfo(address);
+            var timezone = GetTimeZoneInfo(LatLng);
 
             DateTime currentTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timezone.StandardName);
 
             return currentTime;
         }
 
+        /// <summary>
+        /// Returns a string with the general city,state, zipcode, and country code based on a give IP Address
+        /// </summary>
+        /// <param name="IPAddress"></param>
+        /// <returns></returns>
+        private string GetCityInfoFromIP(string IPAddress)
+        {
+            var geoIP = GetGeoIPData(IPAddress);
+
+            if (geoIP != null)
+                return string.Format("{0}, {1}, {2}, {3}", geoIP.city, geoIP.region_code, geoIP.zip_code, geoIP.country_code);
+
+            return null;
+        }
+
         #endregion
 
         #region Helper Functions
 
+        /// <summary>
+        /// Runs the time zone name through all of the transforms, to account for known differences between retrieved and expected time zone names
+        /// </summary>
+        /// <param name="TimeZoneName"></param>
+        /// <returns></returns>
         private IEnumerable<ITimezoneNameTransform> _transformers;
         private string TransformTimeZoneName(string TimeZoneName)
         {
@@ -220,9 +298,15 @@ namespace SunriseSunset
             return temp;
         }
 
-        private string FormatCacheKey(string key, string address)
+        /// <summary>
+        /// Returns a standardized cache key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        private string FormatCacheKey(string key, string latlng)
         {
-            return string.Format("Custom:Cache:{0}:Address={1}", key, HttpUtility.UrlEncode(address));
+            return string.Format("Custom:Cache:{0}:LatLong={1}", key, HttpUtility.UrlEncode(latlng));
         }
 
         #endregion

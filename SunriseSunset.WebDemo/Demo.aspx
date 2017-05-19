@@ -16,7 +16,9 @@
                 hours to current time
             </div>
             <div style="margin-bottom: 10px">
-                <asp:Button ID="btnGetnSunriseSunsetData" runat="server" Text="Get Sunrise/Sunset data" OnClick="btnGetnSunriseSunsetData_Click" />
+                <asp:Button ID="btnGetSunriseSunsetData" runat="server" Text="Get Sunrise/Sunset data by street address" OnClick="btnGetnSunriseSunsetData_Click" />
+                &nbsp;&nbsp;
+                <asp:Button ID="btnGetSunriseSunsetDataByIP" runat="server" Text="Get Sunrise/Sunset data by IP address" OnClick="btnGetSunriseSunsetDataByIP_Click" />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <asp:Button ID="btnClear" runat="server" Text="Clear" OnClick="btnClear_Click" />
             </div>

@@ -4,7 +4,11 @@ namespace SunriseSunset.Abstractions
 {
     public interface ISunriseSunsetData
     {
-        string Address { get; }
+        string Address { get; set; }
+
+        string IPAddress { get; set; }
+        
+        string LatLong { get; set; }
 
         string TimeZoneName { get; set; }
 

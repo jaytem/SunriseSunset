@@ -31,13 +31,22 @@ namespace SunriseSunset.WebDemo {
         protected global::System.Web.UI.WebControls.TextBox txtPlusHours;
         
         /// <summary>
-        /// btnGetnSunriseSunsetData control.
+        /// btnGetSunriseSunsetData control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGetnSunriseSunsetData;
+        protected global::System.Web.UI.WebControls.Button btnGetSunriseSunsetData;
+        
+        /// <summary>
+        /// btnGetSunriseSunsetDataByIP control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnGetSunriseSunsetDataByIP;
         
         /// <summary>
         /// btnClear control.

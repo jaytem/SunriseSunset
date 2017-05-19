@@ -9,12 +9,15 @@ namespace SunriseSunset.Models
 {
     public class SunriseSunsetData : ISunriseSunsetData
     {
-        public SunriseSunsetData(string address)
-        {
-            Address = address;
-        }
+        public SunriseSunsetData()
+        { }
+           
 
-        public string Address { get; }
+        public string Address { get; set; }
+
+        public string IPAddress { get; set; }
+
+        public string LatLong { get; set; }
 
         public DateTime? CurrentTime { get; set; }
 

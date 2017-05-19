@@ -66,6 +66,7 @@
       <DependentUpon>App.config</DependentUpon>
     </Compile>
     <Compile Include="Cache.cs" />
+    <Compile Include="Models\GeoIPData.cs" />
     <Compile Include="Models\LatLongData.cs" />
     <Compile Include="Models\SunriseSunsetData.cs" />
     <Compile Include="Models\TimeZoneData.cs" />
