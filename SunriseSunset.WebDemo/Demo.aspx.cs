@@ -53,11 +53,11 @@ namespace SunriseSunset.WebDemo
            {
 
                 "Walt Disney World Resort, Orlando, FL 32830",
-                "3817 McCoy Dr. Suite 105 Aurora, IL 60504",
-                "Yellowstone National Park, 1 Grand Loop Rd, Yellowstone National Park, WY 82190",
-                "1313 Disneyland Dr, Anaheim, CA 92802",
-                "432 S Franklin St, Juneau, AK 99801",
-                "2752 Woodlawn Dr #518, Honolulu, HI 96822"
+                //"3817 McCoy Dr. Suite 105 Aurora, IL 60504",
+                //"Yellowstone National Park, 1 Grand Loop Rd, Yellowstone National Park, WY 82190",
+                //"1313 Disneyland Dr, Anaheim, CA 92802",
+                //"432 S Franklin St, Juneau, AK 99801",
+                //"2752 Woodlawn Dr #518, Honolulu, HI 96822"
            };
             //"Westminster, London SW1A 0AA, UK",
             //    "77777 Marne-la-Vallée, France",

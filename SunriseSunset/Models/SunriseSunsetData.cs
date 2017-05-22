@@ -24,8 +24,8 @@ namespace SunriseSunset.Models
         {
             var currentTime = DateTime.MinValue;
             
-            if (!string.IsNullOrEmpty(TimeZoneName))
-                currentTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, TimeZoneName);
+            //if (!string.IsNullOrEmpty(TimeZoneName))
+            //    currentTime = DateTime.UtcNow.AddSeconds(  TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, TimeZoneName);
 
             return currentTime;
         }
