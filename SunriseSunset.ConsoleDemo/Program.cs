@@ -32,6 +32,8 @@ namespace SunriseSunset.ConsoleDemo
 
             string[] Addresses = new string[]
             {
+                "Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France",
+                "Westminster, London SW1A 0AA, UK",
                 "Walt Disney World Resort, Orlando, FL 32830",
                 "3817 McCoy Dr. Suite 105 Aurora, IL 60504",
                 "Yellowstone National Park, 1 Grand Loop Rd, Yellowstone National Park, WY 82190",

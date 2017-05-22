@@ -18,30 +18,35 @@ namespace SunriseSunset
         {
             _transformers = transformers;
         }
-
+        
         public ISunriseSunsetData GetByAddress(string Address)
         {
             string latLng = GetLatLongFromAddress(Address);
+            var timezone = GetTimeZoneData(latLng);
 
             var data = new SunriseSunsetData(Address, null);
             data.LatLong = latLng;
-            data.TimeZoneName = GetTimeZoneInfo(latLng).StandardName;
+            data.TimeZoneName = timezone.timeZoneName;
             data.Sunrise = GetSunriseSunset(true, latLng);
             data.Sunset = GetSunriseSunset(false, latLng);
+            data.UtcOffset = timezone.rawOffset;
+            data.DstOffset = timezone.dstOffset;
 
             return data;
         }
 
         public ISunriseSunsetData GetByIP(IPAddress IpAddress)
         {
-            string latLng;
-            latLng = GetLatLongFromIP(IpAddress.ToString());
+            string latLng = GetLatLongFromIP(IpAddress.ToString());
+            var timezone = GetTimeZoneData(latLng);
 
             var data = new SunriseSunsetData(GetCityInfoFromIP(IpAddress.ToString()), IpAddress);
             data.LatLong = latLng;
-            data.TimeZoneName = GetTimeZoneInfo(latLng).StandardName;
+            data.TimeZoneName = timezone.timeZoneName;
             data.Sunrise = GetSunriseSunset(true, latLng);
             data.Sunset = GetSunriseSunset(false, latLng);
+            data.UtcOffset = timezone.rawOffset;
+            data.DstOffset = timezone.dstOffset;
 
             return data;
         }
@@ -62,15 +67,16 @@ namespace SunriseSunset
             if (sunriseSunsetData != null)
             {
                 DateTime? sunrise = null, sunset = null;
-                var timeZone = GetTimeZoneInfo(LatLng);
+                //var timeZone = GetTimeZoneInfo(LatLng);
+                var tz = GetTimeZoneData(LatLng);
 
                 foreach (var item in sunriseSunsetData.sundata)
                 {
                     if (item.phen == "R")
-                        sunrise = TimeZoneInfo.ConvertTimeFromUtc(DateTime.Parse(item.time), timeZone);
+                        sunrise = DateTime.Parse(item.time).AddSeconds(tz.rawOffset + tz.dstOffset);
 
                     if (item.phen == "S")
-                        sunset = TimeZoneInfo.ConvertTimeFromUtc(DateTime.Parse(item.time), timeZone);
+                        sunset = DateTime.Parse(item.time).AddSeconds(tz.rawOffset + tz.dstOffset);
                 }
 
                 if (sunrise != null && sunset != null)
@@ -183,44 +189,33 @@ namespace SunriseSunset
         }
 
         /// <summary>
-        /// Get a System.TimeZoneInfo object for given latitude and longitude corrdinates
+        /// Get a TimeZoneData object for given latitude and longitude corrdinates. With that, you can calculate the current time for the given timezone
         /// </summary>
         /// <param name="Address"></param>
         /// <returns></returns>
-        private TimeZoneInfo GetTimeZoneInfo(string latLng)
+        public TimeZoneData GetTimeZoneData(string latLng)
         {
-            string cacheKey = FormatCacheKey("Timezone", latLng);
+            string cacheKey = FormatCacheKey("TimeZoneData", latLng);
 
-            TimeZoneInfo timeZone = Cache.Get<TimeZoneInfo>(cacheKey);
+            TimeZoneData timeZone = Cache.Get<TimeZoneData>(cacheKey);
 
             if (timeZone == null)
             {
-                // make sure the lat and long coordinates are not empty before continuing on
+                // make sure the lat and long corrdinates are not empty befor continuing on
                 if (!string.IsNullOrEmpty(latLng))
                 {
-                    // Google api requires the number of seconds from midnight on January 1, 1970 to get a timezone
+                    // Goolge api requires the number of seconds from midnight on January 1, 1970 to get a timezone
                     int seconds = (int)(DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
 
                     // Google api requires a developer key for this api
                     string googleKey = ConfigurationManager.AppSettings.Get("GoogleKey");
-
+                    
                     string url = string.Format("https://maps.googleapis.com/maps/api/timezone/json?location={0}&timestamp={1}&key={2}", latLng, seconds, googleKey);
-                    var tz = GetAsyncResult<TimeZoneData>(url);
+                    timeZone = GetAsyncResult<TimeZoneData>(url);
 
-                    if (tz != null)
-                    {
-                        /* May need to make some changes to the time zone name that is retrieved from Google to get the correct 
-                         * System.TimeZone object.
-                         * Needs to be Standard, not Daylight time
-                         * Also, Google timezone names don't always match the names in .Net
-                         */
-                        var timeZoneId = TransformTimeZoneName(tz.timeZoneName);
-
-                        timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-
-                        if (timeZone != null)
-                            Cache.Set(cacheKey, timeZone, 43200);
-                    }
+                    if (timeZone != null)
+                        Cache.Set(cacheKey, timeZone, 43200);
+                         
                 }
             }
 
