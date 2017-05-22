@@ -81,7 +81,7 @@ namespace SunriseSunset
 
                 if (sunrise != null && sunset != null)
                 {
-                    /* Due to summer tiems and UTC offset, the sunset was coming out after midnight UTC, but was being set to the same date
+                    /* Due to summer times and UTC offset, the sunset was coming out after midnight UTC, but was being set to the same date
                      * so sunset was showing as before sunrise. Adding a day to account for this anomoly
                      */
                     if (sunrise > sunset)
@@ -116,7 +116,8 @@ namespace SunriseSunset
 
             if (geoIP != null)
             {
-                Cache.Set(cacheKey, geoIP, 43200);
+                // set the cache for IP addresses to 180 seconds/3 minutes. We want it to cache, but not hang around like the addresses.
+                Cache.Set(cacheKey, geoIP, 180);
             }
 
             return geoIP;

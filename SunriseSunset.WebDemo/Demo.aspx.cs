@@ -26,7 +26,7 @@ namespace SunriseSunset.WebDemo
                 IP = Request.ServerVariables["REMOTE_ADDR"];
 
             if (IP == "127.0.0.1")
-                IP = "207.223.36.84";
+                IP = "185.186.76.101";//"207.223.36.84";
 
             IPAddress ipAddress;
             IPAddress.TryParse(IP, out ipAddress);
