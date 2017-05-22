@@ -129,7 +129,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="timezone.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -144,13 +143,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="timezone.aspx.cs">
-      <DependentUpon>timezone.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="timezone.aspx.designer.cs">
-      <DependentUpon>timezone.aspx</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SunriseSunset.Abstractions\SunriseSunset.Abstractions.csproj">
