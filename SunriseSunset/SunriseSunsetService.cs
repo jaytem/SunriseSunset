@@ -22,36 +22,36 @@ namespace SunriseSunset
         public ISunriseSunsetData GetByAddress(string Address)
         {
             string latLng = GetLatLongFromAddress(Address);
-            var timezone = GetTimeZoneData(latLng);
-
+            
             var data = new SunriseSunsetData(Address, null);
-            data.LatLong = latLng;
-            data.TimeZoneName = timezone.timeZoneName;
-            data.Sunrise = GetSunriseSunset(true, latLng);
-            data.Sunset = GetSunriseSunset(false, latLng);
-            data.UtcOffset = timezone.rawOffset;
-            data.DstOffset = timezone.dstOffset;
-
+            BuildSunriseSunset(latLng, data);
+           
             return data;
         }
 
         public ISunriseSunsetData GetByIP(IPAddress IpAddress)
         {
             string latLng = GetLatLongFromIP(IpAddress.ToString());
-            var timezone = GetTimeZoneData(latLng);
 
             var data = new SunriseSunsetData(GetCityInfoFromIP(IpAddress.ToString()), IpAddress);
+            BuildSunriseSunset(latLng, data);
+            
+            return data;
+        }
+
+        #region Private Functions
+
+        private void BuildSunriseSunset(string latLng, SunriseSunsetData data)
+        {
+            var timezone = GetTimeZoneData(latLng);
+
             data.LatLong = latLng;
             data.TimeZoneName = timezone.timeZoneName;
             data.Sunrise = GetSunriseSunset(true, latLng);
             data.Sunset = GetSunriseSunset(false, latLng);
             data.UtcOffset = timezone.rawOffset;
             data.DstOffset = timezone.dstOffset;
-
-            return data;
         }
-
-        #region Private Functions
 
         /// <summary>
         /// Returns the sunrise or sunset datetime for given latitude and longitude coordates
