@@ -12,8 +12,7 @@ namespace SunriseSunset.Test
     {
         string address;
         SunriseSunsetData invalidAddress;
-        string ipAddress;
-
+     
         private ISunriseSunsetData sut;
         private ISunriseSunsetData sutIP;
 

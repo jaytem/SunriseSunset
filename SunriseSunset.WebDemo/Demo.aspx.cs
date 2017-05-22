@@ -30,7 +30,7 @@ namespace SunriseSunset.WebDemo
 
             IPAddress ipAddress;
             IPAddress.TryParse(IP, out ipAddress);
-          
+
 
             //Start time for lookup run time
             DateTime startTime = DateTime.Now;
@@ -38,7 +38,7 @@ namespace SunriseSunset.WebDemo
             StringBuilder output = new StringBuilder();
 
             output.Append(GetSunriseSunsetData(null, ipAddress));
-            
+
 
             // End time for lookup run time
             DateTime endTime = DateTime.Now;
@@ -51,6 +51,7 @@ namespace SunriseSunset.WebDemo
         {
             string[] addressList = new string[]
            {
+
                 "Walt Disney World Resort, Orlando, FL 32830",
                 "3817 McCoy Dr. Suite 105 Aurora, IL 60504",
                 "Yellowstone National Park, 1 Grand Loop Rd, Yellowstone National Park, WY 82190",
@@ -58,7 +59,8 @@ namespace SunriseSunset.WebDemo
                 "432 S Franklin St, Juneau, AK 99801",
                 "2752 Woodlawn Dr #518, Honolulu, HI 96822"
            };
-
+            //"Westminster, London SW1A 0AA, UK",
+            //    "77777 Marne-la-Vallée, France",
 
             //Start time for lookup run time
             DateTime startTime = DateTime.Now;
@@ -89,7 +91,7 @@ namespace SunriseSunset.WebDemo
             else if (ipAddress != null)
                 data = _SunriseSunsetService.Service.GetByIP(ipAddress);
 
-            
+
 
             if (data.Address != null)
             {

@@ -73,6 +73,7 @@
     <Compile Include="Models\USNavySunData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SunriseSunsetService.cs" />
+    <Compile Include="Transform\SummerTransform.cs" />
     <Compile Include="Transform\AlaskaTransform.cs" />
     <Compile Include="Transform\DaylightTransform.cs" />
     <Compile Include="Transform\HawaiinTransform.cs" />

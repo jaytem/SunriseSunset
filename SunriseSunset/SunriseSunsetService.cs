@@ -214,9 +214,9 @@ namespace SunriseSunset
                          * Needs to be Standard, not Daylight time
                          * Also, Google timezone names don't always match the names in .Net
                          */
-                        var timeZoneName = TransformTimeZoneName(tz.timeZoneName);
+                        var timeZoneId = TransformTimeZoneName(tz.timeZoneName);
 
-                        timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneName);
+                        timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
 
                         if (timeZone != null)
                             Cache.Set(cacheKey, timeZone, 43200);
@@ -276,9 +276,9 @@ namespace SunriseSunset
         /// <param name="TimeZoneName"></param>
         /// <returns></returns>
         private IEnumerable<ITimezoneNameTransform> _transformers;
-        private string TransformTimeZoneName(string TimeZoneName)
+        private string TransformTimeZoneName(string TimeZoneID)
         {
-            string temp = TimeZoneName;
+            string temp = TimeZoneID;
 
             _transformers.All(x => { temp = x.Transform(temp); return true; });
 
