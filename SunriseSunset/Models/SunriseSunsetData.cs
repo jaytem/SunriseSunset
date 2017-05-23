@@ -20,21 +20,21 @@ namespace SunriseSunset.Models
 
         public string LatLong { get; set; }
 
-        public DateTime CurrentTime()
-        {
-            var currentTime = DateTime.MinValue;
-            
-            if (!string.IsNullOrEmpty(TimeZoneName))
-                currentTime = DateTime.UtcNow.AddSeconds(UtcOffset + DstOffset);
-
-            return currentTime;
-        }
-
         public string TimeZoneName { get; set; }
 
         public DateTime? Sunrise { get; set; }
 
         public DateTime? Sunset { get; set; }
+
+        public DateTime CurrentTime()
+        {
+            var currentTime = DateTime.MinValue;
+
+            if (!string.IsNullOrEmpty(TimeZoneName))
+                currentTime = DateTime.UtcNow.AddSeconds(UtcOffset + DstOffset);
+
+            return currentTime;
+        }
 
         public bool IsDaylight(int plusHours = 0)
         {

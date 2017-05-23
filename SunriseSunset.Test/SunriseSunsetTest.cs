@@ -72,7 +72,6 @@ namespace SunriseSunset.Test
         {
             // Assert
             Assert.IsNotNull(sut.TimeZoneName);
-            Assert.AreEqual("Central Standard Time", sut.TimeZoneName);
         }
 
         [TestMethod]
@@ -80,41 +79,7 @@ namespace SunriseSunset.Test
         {
             // Assert
             Assert.IsNotNull(sutIP.TimeZoneName);
-            Assert.AreEqual("Central Standard Time", sutIP.TimeZoneName);
         }
-
-        [TestMethod]
-        public void SunsriseSunset_TimezoneNameTransform_IsCorrect()
-        {
-            // Act
-            var data = service.Service.GetByAddress("2752 Woodlawn Dr #518, Honolulu, HI 96822");
-
-            // Assert
-            Assert.IsNotNull(data.TimeZoneName);
-            Assert.AreEqual("Hawaiian Standard Time", data.TimeZoneName);
-        }
-
-        //[TestMethod]
-        //public void SunriseSunset_IsDaytime_Check()
-        //{
-        //    SunriseSunsetData data = new SunriseSunsetData(address, null);
-        //    data.Sunrise = new DateTime(2017, 01, 01, 06, 00, 00);
-        //    data.Sunset = data.Sunrise.Value.AddHours(12);
-            
-        //    // Assert
-        //    Assert.AreEqual(true, data.IsDaylight());
-        //}
-
-        //[TestMethod]
-        //public void SunriseSunset_IsNighttime_Check()
-        //{
-        //    SunriseSunsetData data = new SunriseSunsetData(address, null);
-        //    data.Sunrise = new DateTime(2017, 01, 01, 06, 00, 00);
-        //    data.Sunset = data.Sunrise.Value.AddHours(12);
-           
-        //    // Assert
-        //    Assert.AreEqual(false, data.IsDaylight(15));
-        //}
 
         [TestMethod]
         public void SunsriseSunset_CurrentTimeByAddress_IsPopulated()
